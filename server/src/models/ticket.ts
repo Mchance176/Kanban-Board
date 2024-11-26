@@ -1,31 +1,22 @@
-import { DataTypes, Sequelize, Model, Optional } from 'sequelize';
-import { User } from './user';
+import { Model, DataTypes, Sequelize } from 'sequelize';
 
-interface TicketAttributes {
-  id: number;
-  name: string;
-  status: string;
+export interface TicketAttributes {
+  id?: number;
+  title: string;
   description: string;
+  status: string;
   assignedUserId?: number;
 }
 
-interface TicketCreationAttributes extends Optional<TicketAttributes, 'id'> {}
+export const TicketFactory = (sequelize: Sequelize) => {
+  class Ticket extends Model<TicketAttributes> implements TicketAttributes {
+    public id!: number;
+    public title!: string;
+    public description!: string;
+    public status!: string;
+    public assignedUserId?: number;
+  }
 
-export class Ticket extends Model<TicketAttributes, TicketCreationAttributes> implements TicketAttributes {
-  public id!: number;
-  public name!: string;
-  public status!: string;
-  public description!: string;
-  public assignedUserId!: number;
-
-  // associated User model
-  public readonly assignedUser?: User;
-
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
-}
-
-export function TicketFactory(sequelize: Sequelize): typeof Ticket {
   Ticket.init(
     {
       id: {
@@ -33,28 +24,35 @@ export function TicketFactory(sequelize: Sequelize): typeof Ticket {
         autoIncrement: true,
         primaryKey: true,
       },
-      name: {
+      title: {
         type: DataTypes.STRING,
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       status: {
         type: DataTypes.STRING,
         allowNull: false,
-      },
-      description: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        defaultValue: 'todo',
       },
       assignedUserId: {
         type: DataTypes.INTEGER,
-        allowNull: true,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
       },
     },
     {
-      tableName: 'tickets',
       sequelize,
+      modelName: 'Ticket',
+      tableName: 'tickets',
     }
   );
 
   return Ticket;
-}
+};
+
+export type TicketModel = ReturnType<typeof TicketFactory>;

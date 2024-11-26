@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { Ticket } from '../models/ticket.js';
+import { Ticket } from '../models/index.js';
 import { User } from '../models/user.js';
 
 // GET /tickets
@@ -45,33 +45,34 @@ export const getTicketById = async (req: Request, res: Response) => {
 
 // POST /tickets
 export const createTicket = async (req: Request, res: Response) => {
-  const { name, status, description, assignedUserId } = req.body;
   try {
-    const newTicket = await Ticket.create({ name, status, description, assignedUserId });
+    const { title, status, description, assignedUserId } = req.body;
+    const newTicket = await Ticket.create({ title, status, description, assignedUserId });
     res.status(201).json(newTicket);
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json(err);
   }
 };
 
 // PUT /tickets/:id
 export const updateTicket = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { name, status, description, assignedUserId } = req.body;
   try {
-    const ticket = await Ticket.findByPk(id);
+    const { title, status, description, assignedUserId } = req.body;
+    const ticket = await Ticket.findByPk(req.params.id);
+    
     if (ticket) {
-      ticket.name = name;
+      ticket.title = title;
       ticket.status = status;
       ticket.description = description;
       ticket.assignedUserId = assignedUserId;
+      
       await ticket.save();
       res.json(ticket);
     } else {
       res.status(404).json({ message: 'Ticket not found' });
     }
-  } catch (error: any) {
-    res.status(400).json({ message: error.message });
+  } catch (err) {
+    res.status(500).json(err);
   }
 };
 

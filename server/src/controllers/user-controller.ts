@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { User } from '../models/user.js';
+import { User } from '../models/index.js';
 
-// GET /Users
+// GET /users
 export const getAllUsers = async (_req: Request, res: Response) => {
   try {
     const users = await User.findAll({
-      attributes: { exclude: ['password'] }
+      attributes: ['id', 'username'] // Exclude password
     });
     res.json(users);
   } catch (error: any) {
@@ -13,12 +13,11 @@ export const getAllUsers = async (_req: Request, res: Response) => {
   }
 };
 
-// GET /Users/:id
+// GET /users/:id
 export const getUserById = async (req: Request, res: Response) => {
-  const { id } = req.params;
   try {
-    const user = await User.findByPk(id, {
-      attributes: { exclude: ['password'] }
+    const user = await User.findByPk(req.params.id, {
+      attributes: ['id', 'username'] // Exclude password
     });
     if (user) {
       res.json(user);
@@ -30,28 +29,36 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-// POST /Users
+// POST /users
 export const createUser = async (req: Request, res: Response) => {
-  const { username, password } = req.body;
   try {
-    const newUser = await User.create({ username, password });
-    res.status(201).json(newUser);
+    const { username, password } = req.body;
+    const user = await User.create({ username, password });
+    res.status(201).json({
+      id: user.id,
+      username: user.username
+    });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }
 };
 
-// PUT /Users/:id
+// PUT /users/:id
 export const updateUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { username, password } = req.body;
   try {
-    const user = await User.findByPk(id);
+    const { username, password } = req.body;
+    const user = await User.findByPk(req.params.id);
+    
     if (user) {
       user.username = username;
-      user.password = password;
+      if (password) {
+        user.password = password;
+      }
       await user.save();
-      res.json(user);
+      res.json({
+        id: user.id,
+        username: user.username
+      });
     } else {
       res.status(404).json({ message: 'User not found' });
     }
@@ -60,11 +67,10 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-// DELETE /Users/:id
+// DELETE /users/:id
 export const deleteUser = async (req: Request, res: Response) => {
-  const { id } = req.params;
   try {
-    const user = await User.findByPk(id);
+    const user = await User.findByPk(req.params.id);
     if (user) {
       await user.destroy();
       res.json({ message: 'User deleted' });
@@ -74,4 +80,4 @@ export const deleteUser = async (req: Request, res: Response) => {
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
-};
+}; 

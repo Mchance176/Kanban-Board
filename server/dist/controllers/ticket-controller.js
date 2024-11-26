@@ -1,4 +1,4 @@
-import { Ticket } from '../models/ticket.js';
+import { Ticket } from '../models/index.js';
 import { User } from '../models/user.js';
 // GET /tickets
 export const getAllTickets = async (_req, res) => {
@@ -44,23 +44,22 @@ export const getTicketById = async (req, res) => {
 };
 // POST /tickets
 export const createTicket = async (req, res) => {
-    const { name, status, description, assignedUserId } = req.body;
     try {
-        const newTicket = await Ticket.create({ name, status, description, assignedUserId });
+        const { title, status, description, assignedUserId } = req.body;
+        const newTicket = await Ticket.create({ title, status, description, assignedUserId });
         res.status(201).json(newTicket);
     }
-    catch (error) {
-        res.status(400).json({ message: error.message });
+    catch (err) {
+        res.status(500).json(err);
     }
 };
 // PUT /tickets/:id
 export const updateTicket = async (req, res) => {
-    const { id } = req.params;
-    const { name, status, description, assignedUserId } = req.body;
     try {
-        const ticket = await Ticket.findByPk(id);
+        const { title, status, description, assignedUserId } = req.body;
+        const ticket = await Ticket.findByPk(req.params.id);
         if (ticket) {
-            ticket.name = name;
+            ticket.title = title;
             ticket.status = status;
             ticket.description = description;
             ticket.assignedUserId = assignedUserId;
@@ -71,8 +70,8 @@ export const updateTicket = async (req, res) => {
             res.status(404).json({ message: 'Ticket not found' });
         }
     }
-    catch (error) {
-        res.status(400).json({ message: error.message });
+    catch (err) {
+        res.status(500).json(err);
     }
 };
 // DELETE /tickets/:id

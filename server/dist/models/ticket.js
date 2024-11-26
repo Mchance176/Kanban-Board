@@ -1,32 +1,37 @@
-import { DataTypes, Model } from 'sequelize';
-export class Ticket extends Model {
-}
-export function TicketFactory(sequelize) {
+import { Model, DataTypes } from 'sequelize';
+export const TicketFactory = (sequelize) => {
+    class Ticket extends Model {
+    }
     Ticket.init({
         id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
         },
-        name: {
+        title: {
             type: DataTypes.STRING,
+            allowNull: false,
+        },
+        description: {
+            type: DataTypes.TEXT,
             allowNull: false,
         },
         status: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
-        description: {
-            type: DataTypes.STRING,
-            allowNull: false,
+            defaultValue: 'todo',
         },
         assignedUserId: {
             type: DataTypes.INTEGER,
-            allowNull: true,
+            references: {
+                model: 'users',
+                key: 'id',
+            },
         },
     }, {
-        tableName: 'tickets',
         sequelize,
+        modelName: 'Ticket',
+        tableName: 'tickets',
     });
     return Ticket;
-}
+};
