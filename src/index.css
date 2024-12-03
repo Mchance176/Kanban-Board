@@ -1,0 +1,38 @@
+/* Reset default styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Root variables */
+:root {
+  --primary-color: #646cff;
+  --secondary-color: #535bf2;
+  --text-color: rgba(255, 255, 255, 0.87);
+  --background-color: #242424;
+}
+
+body {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+/* Link styles */
+a {
+  color: var(--primary-color);
+  text-decoration: inherit;
+}
+a:hover {
+  color: var(--secondary-color);
+}
+
+/* Container styles */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
