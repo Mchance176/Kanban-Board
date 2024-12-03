@@ -1,8 +1,13 @@
-import { User } from '../models/user.js';
 export const seedUsers = async () => {
-    await User.bulkCreate([
+    try {
+      const users = await User.bulkCreate([
         { username: 'JollyGuru', password: 'password' },
         { username: 'SunnyScribe', password: 'password' },
         { username: 'RadiantComet', password: 'password' },
-    ], { individualHooks: true });
-};
+      ], { individualHooks: true });
+      
+      console.log('Users seeded successfully:', users.map(u => u.username));
+    } catch (error) {
+      console.error('Error seeding users:', error);
+    }
+  };
